@@ -1,9 +1,3 @@
-"""
-Task 2 tools. `search_web` and `wiki_summary` are imported straight from
-Task 1 -- the Researcher role reuses them unchanged. The Writer, Critic and
-Publish roles get their own tools, because they do genuinely different jobs.
-"""
-
 from __future__ import annotations
 
 import importlib.util
