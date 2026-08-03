@@ -1,33 +1,3 @@
-"""
-Task 2 demo runner.
-
-Usage:
-    export GOOGLE_API_KEY=...
-    export LANGSMITH_API_KEY=...        # optional, for tracing
-    export LANGCHAIN_TRACING_V2=true    # optional, for tracing
-    python main.py
-
-Produces, in order:
-  1. graph.png                    - the LangGraph-drawn diagram of the team.
-  2. RUN A (parallel path)        - a two-subtopic topic, fans out over
-                                     Send, gets rejected once by the critic
-                                     (loop-back with a cap), then pauses at
-                                     the human breakpoint before publish.
-  3. Time-travel                  - inspects get_state_history for RUN A,
-                                     finds the checkpoint right after the
-                                     critic's rejection, and shows what a
-                                     fork/replay from there would look like.
-  4. Resume RUN A                 - approve and continue past the breakpoint.
-  5. RUN B (memory-skip path)     - the SAME topic in a brand new session
-                                     (different thread_id). Long-term memory
-                                     (the store) means the planner reuses
-                                     the notes from RUN A instead of
-                                     re-researching, and the graph takes a
-                                     different path than RUN A did.
-  6. RUN C (single, non-parallel path) - a one-subtopic topic, to exercise
-                                     the third branch of the same conditional.
-"""
-
 from __future__ import annotations
 
 import os
