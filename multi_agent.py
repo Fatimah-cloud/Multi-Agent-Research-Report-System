@@ -1,47 +1,3 @@
-"""
-Task 2 — a 4-role multi-agent system, extending Task 1 directly:
-  * reuses Task 1's `notes` reducer (state.py) and `search_web`/`wiki_summary`
-    tools (tools.py) unchanged.
-  * still uses a checkpointer + recursion limit exactly like Task 1.
-
-Roles (genuinely different jobs, different tools):
-  Planner       - splits the topic into subtopics; also checks long-term
-                  memory for a prior run on this exact topic.
-  Researcher    - (sub_researcher / single_research) calls search_web +
-                  wiki_summary. Runs either in PARALLEL (Send fan-out, one
-                  instance per subtopic) or as a single direct call,
-                  depending on state -- this is the conditional-routing
-                  requirement.
-  Writer        - turns notes into a draft. Tool: save_draft (scratch file).
-  Critic        - reviews the draft. Tool: check_coverage (deterministic)
-                  plus an LLM judgment call. Can loop the work back to the
-                  Writer, capped by max_revisions.
-  (Publish is a plain node, not an "agent", gated by a human-in-the-loop
-  breakpoint, since publishing is the irreversible step.)
-
-Graph:
-
-              +-------------------+
-              |      planner      |
-              +-------------------+
-               /        |         \\
-        (cached)   (>1 subtopic) (1 subtopic)
-              |          |            |
-          writer   [Send fan-out]  single_research
-              ^     sub_researcher     |
-              |          \\___________ /
-              |                |
-              |             writer <-------+
-              |                |           |
-              |             critic          |
-              |            /   \\           |
-              |     (approved) (needs work, revisions < cap)
-              |         |            \\_____|
-              |     [HUMAN BREAKPOINT]
-              |         |
-              |      publish (writes long-term memory) -> END
-"""
-
 from __future__ import annotations
 
 import os
@@ -74,14 +30,7 @@ def _llm(temperature: float = 0):
 
 
 def _text(content) -> str:
-    """Normalize an LLM response's .content into a plain string.
-
-    Some Gemini models (e.g. gemini-3.1-flash-lite) return .content as a
-    list of content blocks (e.g. [{"type": "text", "text": "..."}]) rather
-    than a plain string. Downstream code (file writes, string methods)
-    expects a string either way, so this flattens whatever shape comes
-    back.
-    """
+    
     if isinstance(content, str):
         return content
     if isinstance(content, list):
