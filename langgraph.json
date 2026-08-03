@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "task2_team": "./multi_agent.py:graph"
+  },
+  "env": "./.env"
+}
