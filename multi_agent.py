@@ -13,11 +13,7 @@ from tools import check_coverage, publish_report, save_draft, search_web, wiki_s
 
 
 class SubState(TypedDict):
-    """Minimal input schema for a fanned-out sub_researcher instance.
-
-    This is the map-reduce.ipynb pattern: each parallel Send carries just
-    the one field the sub-task needs, not the whole TeamState.
-    """
+  
     subtopic: str
 
 
@@ -55,8 +51,7 @@ def planner_node(state: TeamState, config, *, store: BaseStore) -> dict:
 
     cached = store.get(namespace, topic)
     if cached is not None:
-        # Long-term memory hit: reuse notes gathered in a PREVIOUS, separate
-        # session instead of re-researching from scratch.
+      
         return {
             "notes": cached.value["notes"],
             "subtopics": cached.value["subtopics"],
@@ -65,9 +60,7 @@ def planner_node(state: TeamState, config, *, store: BaseStore) -> dict:
             "messages": [HumanMessage(content=f"[memory] Reusing prior research on '{topic}'.")],
         }
 
-    # No memory hit -> split the topic into subtopics. A real system might
-    # call the LLM for this; a light heuristic is enough to demonstrate the
-    # routing and keeps the demo deterministic.
+   
     parts = [p.strip() for p in topic.replace(" and ", ",").split(",") if p.strip()]
     subtopics = parts if len(parts) > 1 else [topic]
 
@@ -79,7 +72,7 @@ def planner_node(state: TeamState, config, *, store: BaseStore) -> dict:
 
 
 def route_after_planner(state: TeamState):
-    """Conditional routing whose path depends on state (task requirement)."""
+   
     if state.get("notes"):
         # memory-skip branch
         return "writer"
@@ -101,13 +94,12 @@ def _research_one(subtopic: str) -> str:
 
 
 def sub_researcher(state: SubState) -> dict:
-    """Runs once per subtopic, in parallel, via Send. Output merges into the
-    parent graph's `notes` field through the add_notes reducer."""
+ 
     return {"notes": [_research_one(state["subtopic"])]}
 
 
 def single_research(state: TeamState) -> dict:
-    """The non-parallel branch: one subtopic, called directly (no Send)."""
+    
     return {"notes": [_research_one(state["subtopics"][0])]}
 
 
@@ -208,9 +200,5 @@ def build_graph():
     return graph
 
 
-# Compiled graph for `langgraph dev` / LangGraph Studio to import directly.
-# No explicit checkpointer or store here -- the Studio dev server provides
-# its own persistence layer and injects it into any node that asks for a
-# `store`/`config` parameter, same as planner_node and publish_node do here.
-# The human breakpoint stays active so you can watch it pause live in Studio.
+
 graph = build_graph().compile(interrupt_before=["publish"])
