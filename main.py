@@ -28,6 +28,20 @@ def fresh_initial_state(topic: str) -> dict:
         "max_revisions": 2,
     }
 
+def human_review(graph, config, approve: bool, reason: str = "Rejected by human reviewer.") -> dict:
+    """Resolve the human-in-the-loop breakpoint that sits before `publish`."""
+    if approve:
+        return graph.invoke(None, config=config)
+
+    current = graph.get_state(config)
+    revisions = current.values.get("revisions", 0) + 1
+    graph.update_state(
+        config,
+        {"approved": False, "critique": f"REVISE (human): {reason}", "revisions": revisions},
+        as_node="critic",
+    )
+    return graph.invoke(None, config=config)
+
 
 def save_graph_diagram(graph):
     try:
@@ -80,9 +94,16 @@ def main():
     else:
         print("No rejection occurred in this run (the critic approved on the first pass).")
 
-    # ---------------- resume past breakpoint ----------------
-    print("\n---------- resuming RUN A past the human breakpoint ----------")
-    graph_a.invoke(None, config=config_a)
+   # ---------------- human review of the breakpoint ----------------
+    print("\n---------- human REJECTS the draft ----------")
+    human_review(graph_a, config_a, approve=False, reason="Needs a stronger conclusion.")
+    s = graph_a.get_state(config_a)
+    print("Revisions after rejection:", s.values["revisions"])
+    print("Critique on record:", s.values["critique"])
+    print("Paused before (should be publish again):", s.next)
+
+    print("\n---------- human APPROVES the revised draft ----------")
+    human_review(graph_a, config_a, approve=True)
     print("RUN A finished. Final state.next:", graph_a.get_state(config_a).next)
 
     # ---------------- RUN B: memory-skip branch ----------------
