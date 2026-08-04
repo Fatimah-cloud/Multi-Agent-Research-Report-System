@@ -29,7 +29,7 @@ def fresh_initial_state(topic: str) -> dict:
     }
 
 def human_review(graph, config, approve: bool, reason: str = "Rejected by human reviewer.") -> dict:
-    """Resolve the human-in-the-loop breakpoint that sits before `publish`."""
+  
     if approve:
         return graph.invoke(None, config=config)
 
