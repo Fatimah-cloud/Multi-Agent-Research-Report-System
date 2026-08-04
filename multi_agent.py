@@ -114,11 +114,11 @@ def single_research(state: TeamState) -> dict:
 # --------------------------------------------------------------------------
 # Writer
 # --------------------------------------------------------------------------
-
 def writer_node(state: TeamState) -> dict:
-   
     prompt = (
-        f"Write a tight 4-6 sentence report on '{state['topic']}', covering: "
+        f"Write a well-developed report (4-6 paragraphs, roughly 400-600 words) on '{state['topic']}'. "
+        f"Give it a short introduction, then a dedicated paragraph for each of the following subtopics, "
+        f"then a brief conclusion. Cover: "
         f"{', '.join(state['subtopics'])}.\n\nResearch notes:\n"
         + "\n".join(f"- {n}" for n in state["notes"])
     )
