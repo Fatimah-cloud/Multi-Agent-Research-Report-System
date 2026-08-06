@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import os
-
-import os
 os.environ["GOOGLE_API_KEY"] = "Gemini key"
 os.environ["GEMINI_MODEL"] = "gemini-3.1-flash-lite"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
